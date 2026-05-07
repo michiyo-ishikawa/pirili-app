@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>ピリリ会パーティー管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<style>
+:root{
+  --bg:#FAF6EC;
+  --bg-2:#F3EBD4;
+  --paper:#FFFDF7;
+  --ink:#2B2620;
+  --ink-soft:#5A4F42;
+  --ink-mute:#8A7E6E;
+  --gold:#B8964A;
+  --gold-deep:#8C6F2E;
+  --line:#E4D8B8;
+  --line-soft:#EFE6CC;
+  --ok:#2E7D5B;
+  --ng:#B14848;
+  --warn:#C99437;
+  --shadow:0 2px 14px rgba(120,95,40,0.10);
+  --shadow-lg:0 8px 30px rgba(120,95,40,0.16);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New","Hiragino Sans","Meiryo",sans-serif;font-size:15px;line-height:1.55}
+body{
+  background:
+    radial-gradient(circle at 15% 10%, rgba(184,150,74,0.08), transparent 50%),
+    radial-gradient(circle at 85% 90%, rgba(140,111,46,0.06), transparent 55%),
+    var(--bg);
+  min-height:100vh;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+input,select,textarea{outline:none}
+
+/* === ログイン === */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg);z-index:1000}
+.login-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:32px 24px;width:100%;max-width:340px;box-shadow:var(--shadow-lg);text-align:center}
+.login-title{font-family:"Noto Serif JP",serif;font-size:22px;font-weight:700;color:var(--gold-deep);margin:0 0 6px}
+.login-sub{font-size:12px;color:var(--ink-mute);margin:0 0 22px}
+.login-card input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:9px;background:#fff;margin-bottom:14px;font-size:16px}
+.login-card button{width:100%;padding:13px;background:var(--gold);color:#fff;border-radius:9px;font-weight:700;letter-spacing:0.04em;font-size:15px}
+.login-card button:disabled{opacity:0.5}
+.login-err{color:var(--ng);font-size:12px;margin:8px 0 0;min-height:16px}
+
+/* === ヘッダ === */
+header{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 14px}
+.header-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-family:"Noto Serif JP",serif;font-weight:700;color:var(--gold-deep);font-size:16px;letter-spacing:0.02em;line-height:1.2}
+.brand small{display:block;font-size:10px;color:var(--ink-mute);font-weight:500;letter-spacing:0.05em;margin-top:1px}
+.sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-left:6px;animation:pulse 2s infinite;vertical-align:middle}
+.sync-dot.off{background:var(--ng);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.header-actions{display:flex;gap:6px}
+.icon-btn{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--line);font-size:18px;color:var(--gold-deep)}
+.icon-btn:active{transform:scale(0.94)}
+
+/* === タブ === */
+.tabs-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:10px;padding-bottom:2px}
+.tabs-wrap::-webkit-scrollbar{display:none}
+.tabs{display:inline-flex;gap:4px;white-space:nowrap;padding:0 1px}
+.tab{padding:7px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px;color:var(--ink-soft);font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s}
+.tab.active{background:var(--gold-deep);color:#fff;border-color:var(--gold-deep);font-weight:700}
+.tab .count{font-size:11px;opacity:0.85;font-variant-numeric:tabular-nums}
+
+/* === 検索 === */
+.search-bar{display:flex;gap:8px;margin-top:9px;align-items:center}
+.search-bar input{flex:1;padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px}
+
+/* === リスト === */
+main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
+.list-meta{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;font-size:12px;color:var(--ink-mute)}
+.list-meta strong{color:var(--gold-deep);font-size:13px;font-weight:700}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:8px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card.sk-yes{border-left:4px solid var(--ok)}
+.card.sk-no{border-left:4px solid var(--ng)}
+.card.sk-skip{border-left:4px solid var(--ink-mute);opacity:0.78}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card-name{font-weight:700;font-size:16px;color:var(--ink);line-height:1.3}
+.card-org{font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.35}
+.card-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.badge{font-size:10.5px;padding:2px 7px;border-radius:999px;background:var(--bg-2);color:var(--ink-soft);font-weight:500;letter-spacing:0.02em}
+.badge.b-skip{background:#EAE3D2;color:var(--ink-mute)}
+.badge.b-done{background:#E5EFD9;color:#5C7A2A}
+.badge.b-yes{background:#D9ECE2;color:var(--ok)}
+.badge.b-no{background:#F3DCDC;color:var(--ng)}
+.badge.b-pend{background:#F7E6C7;color:#8C6A1B}
+.card-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.mini-btn{flex:1;min-width:75px;padding:7px 8px;border-radius:8px;background:#fff;border:1px solid var(--line);font-size:12.5px;color:var(--ink-soft);font-weight:500}
+.mini-btn:active{background:var(--bg-2)}
+.mini-btn.primary{background:var(--gold);color:#fff;border-color:var(--gold)}
+
+/* === FAB === */
+.fab{position:fixed;right:18px;bottom:22px;width:56px;height:56px;border-radius:50%;background:var(--gold-deep);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(140,111,46,0.4);z-index:40;font-weight:300;line-height:1}
+.fab:active{transform:scale(0.92)}
+
+/* === モーダル === */
+.modal{position:fixed;inset:0;background:rgba(43,38,32,0.55);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal.show{display:flex;animation:fadein 0.2s}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.sheet{background:var(--paper);width:100%;max-width:560px;max-height:92vh;border-radius:16px 16px 0 0;overflow-y:auto;animation:slideup 0.25s cubic-bezier(0.2,0.9,0.3,1)}
+@media(min-width:560px){.modal{align-items:center}.sheet{border-radius:16px;max-height:88vh}}
+@keyframes slideup{from{transform:translateY(40px);opacity:0.6}to{transform:translateY(0);opacity:1}}
+.sheet-head{position:sticky;top:0;background:var(--paper);padding:14px 18px 10px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center}
+.sheet-title{font-family:"Noto Serif JP",serif;font-size:17px;font-weight:700;color:var(--gold-deep)}
+.sheet-close{font-size:24px;color:var(--ink-mute);width:32px;height:32px;line-height:1}
+.sheet-body{padding:14px 18px 22px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:11.5px;color:var(--ink-mute);margin-bottom:5px;letter-spacing:0.04em;font-weight:500}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:15px}
+.field textarea{min-height:60px;resize:vertical}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-row{display:flex;gap:9px;margin-top:18px}
+.btn{flex:1;padding:12px;border-radius:9px;font-weight:700;font-size:14px;letter-spacing:0.04em}
+.btn.primary{background:var(--gold-deep);color:#fff}
+.btn.secondary{background:#fff;color:var(--ink-soft);border:1px solid var(--line)}
+.btn.danger{background:#fff;color:var(--ng);border:1px solid #E8C7C7}
+
+/* メニュー */
+.menu-list{list-style:none;padding:0;margin:0}
+.menu-list li{padding:14px 18px;border-bottom:1px solid var(--line-soft);font-size:15px;display:flex;align-items:center;gap:10px;color:var(--ink)}
+.menu-list li:active{background:var(--bg-2)}
+.menu-list li:last-child{border:none}
+.menu-list li .ico{font-size:18px;width:24px;text-align:center}
+.menu-list li.danger{color:var(--ng)}
+
+/* トースト */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1}
+
+/* ローディング */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--ink-mute);font-size:13px}
+.empty{text-align:center;padding:50px 20px;color:var(--ink-mute);font-size:13px}
+.empty-ico{font-size:34px;margin-bottom:10px;opacity:0.5}
+
+/* 確認ダイアログ */
+.confirm-box{padding:22px 20px;text-align:center}
+.confirm-msg{font-size:15px;margin-bottom:18px;color:var(--ink);line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1 class="login-title">ピリリ会</h1>
+    <p class="login-sub">パーティー管理アプリ</p>
+    <input type="password" id="pw-input" placeholder="共有パスワード" autocomplete="current-password">
+    <button id="login-btn">ログイン</button>
+    <p class="login-err" id="login-err"></p>
+  </div>
+</div>
+
+<!-- メインアプリ -->
+<div id="app" style="display:none">
+  <header>
+    <div class="header-top">
+      <div class="brand">
+        ピリリ会パーティー管理<span class="sync-dot" id="sync-dot"></span>
+        <small>感謝と、これからも。 / 2026.7.2</small>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btn-menu" aria-label="メニュー">⋯</button>
+      </div>
+    </div>
+    <div class="tabs-wrap">
+      <div class="tabs" id="tabs"></div>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="氏名・所属で検索">
+    </div>
+  </header>
+
+  <main>
+    <div class="list-meta">
+      <span id="meta-count">—</span>
+      <span id="meta-sync"></span>
+    </div>
+    <div id="list"><div class="loading">読み込み中…</div></div>
+  </main>
+
+  <button class="fab" id="fab-add" aria-label="追加">＋</button>
+</div>
+
+<!-- 編集モーダル -->
+<div class="modal" id="edit-modal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-title" id="edit-title">編集</div>
+      <button class="sheet-close" id="edit-close">×</button>
+    </div>
+    <div class="sheet-body">
+      <div class="field">
+        <label>氏名 *</label>
+        <input type="text" id="f-name" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>所属</label>
+        <input type="text" id="f-org" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>案内区分</label>
+        <select id="f-invite">
+          <option value="required">案内要</option>
+          <option value="not_required">案内不要</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>出欠</label>
+          <select id="f-attend">
+            <option value="">未選択</option>
+            <option value="yes">○ 出席</option>
+            <option value="no">× 欠席</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>案内担当</label>
+          <select id="f-staff">
+            <option value="">未選択</option>
+            <option value="土井">土井</option>
+            <option value="仮谷">仮谷</option>
+            <option value="TSC">TSC</option>
+            <option value="石川">石川</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>案内日</label>
+          <input type="date" id="f-invite-date">
+        </div>
+        <div class="field">
+          <label>返信日</label>
+          <input type="date" id="f-reply-date">
+        </div>
+      </div>
+      <div class="field">
+        <label>備考</label>
+        <textarea id="f-memo" rows="2"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn danger" id="btn-delete" style="display:none">削除</button>
+        <button class="btn secondary" id="btn-cancel">キャンセル</button>
+        <button class="btn primary" id="btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- メニューモーダル -->
+<div class="modal" id="menu-modal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-title">メニュー</div>
+      <button class="sheet-close" data-close>×</button>
+    </div>
+    <ul class="menu-list">
+      <li id="menu-export-xlsx"><span class="ico">📊</span> 現在のタブをExcel出力</li>
+      <li id="menu-export-pdf"><span class="ico">📄</span> 現在のタブをPDF出力</li>
+      <li id="menu-stats"><span class="ico">📈</span> 集計を見る</li>
+      <li id="menu-logout" class="danger"><span class="ico">🚪</span> ログアウト</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 集計モーダル -->
+<div class="modal" id="stats-modal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-title">集計</div>
+      <button class="sheet-close" data-close>×</button>
+    </div>
+    <div class="sheet-body" id="stats-body"></div>
+  </div>
+</div>
+
+<!-- 確認モーダル -->
+<div class="modal" id="confirm-modal">
+  <div class="sheet" style="max-width:340px">
+    <div class="confirm-box">
+      <div class="confirm-msg" id="confirm-msg"></div>
+      <div class="btn-row">
+        <button class="btn secondary" id="confirm-no">キャンセル</button>
+        <button class="btn primary" id="confirm-yes">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+// ===== Firebase 設定 (★置き換えてください) =====
+const firebaseConfig = {
+  apiKey: "AIzaSyCLGL87Y12LXrvKV7Bsh-MYvqwgRlzBKlk",
+  authDomain: "doiparty.firebaseapp.com",
+  projectId: "doiparty",
+  storageBucket: "doiparty.firebasestorage.app",
+  messagingSenderId: "337326628",
+  appId: "1:337326628:web:a88038549a1b97a7271eb1"
+};
+// ===============================================
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+const STATE = {
+  members:[],
+  filter:'all',
+  search:'',
+  editingId:null,
+  unsub:null,
+  authedPw:null
+};
+
+const TABS = [
+  {key:'all', label:'全体'},
+  {key:'invite_req', label:'案内要'},
+  {key:'invite_skip', label:'案内不要'},
+  {key:'invited', label:'案内済'},
+  {key:'pending', label:'未返信'},
+  {key:'yes', label:'出席'},
+  {key:'no', label:'欠席'}
+];
+
+const $ = id => document.getElementById(id);
+const toast = (msg) => {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._tid); t._tid = setTimeout(()=>t.classList.remove('show'), 1800);
+};
+
+// ====== ログイン ======
+async function tryLogin(pw){
+  $('login-err').textContent = '';
+  $('login-btn').disabled = true;
+  try {
+    // 匿名認証
+    await signInAnonymously(auth);
+    // パスワードドキュメントを読みに行く(Firestoreルールで読み込みは認証済みなら許可)
+    const pwDoc = await getDoc(doc(db, 'config', 'access'));
+    if (!pwDoc.exists()) {
+      $('login-err').textContent = '初期設定が完了していません';
+      $('login-btn').disabled = false; return;
+    }
+    if (pwDoc.data().password !== pw) {
+      $('login-err').textContent = 'パスワードが違います';
+      $('login-btn').disabled = false; return;
+    }
+    STATE.authedPw = pw;
+    sessionStorage.setItem('pirili_pw', pw);
+    $('login-screen').style.display = 'none';
+    $('app').style.display = 'block';
+    startSync();
+  } catch(e) {
+    console.error(e);
+    $('login-err').textContent = '接続エラー: ' + (e.message || e.code);
+    $('login-btn').disabled = false;
+  }
+}
+$('login-btn').addEventListener('click', ()=>tryLogin($('pw-input').value));
+$('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin($('pw-input').value); });
+
+// ====== Firestore リアルタイム購読 ======
+function startSync(){
+  const colRef = collection(db, 'members');
+  STATE.unsub = onSnapshot(colRef, snap => {
+    const items = [];
+    snap.forEach(d => items.push({id:d.id, ...d.data()}));
+    items.sort((a,b)=>(a.name||'').localeCompare(b.name||'','ja'));
+    STATE.members = items;
+    $('sync-dot').classList.remove('off');
+    render();
+  }, err => {
+    console.error('Sync error', err);
+    $('sync-dot').classList.add('off');
+    toast('同期エラー: '+err.code);
+  });
+}
+
+// ====== タブ ======
+function buildTabs(){
+  const counts = computeCounts();
+  $('tabs').innerHTML = TABS.map(t=>`<button class="tab ${STATE.filter===t.key?'active':''}" data-tab="${t.key}">${t.label}<span class="count">${counts[t.key]}</span></button>`).join('');
+  $('tabs').querySelectorAll('.tab').forEach(b=>b.addEventListener('click', ()=>{
+    STATE.filter = b.dataset.tab; render();
+  }));
+}
+function computeCounts(){
+  const c = {all:0,invite_req:0,invite_skip:0,invited:0,pending:0,yes:0,no:0};
+  for (const m of STATE.members){
+    c.all++;
+    if (m.invite==='not_required') c.invite_skip++;
+    else c.invite_req++;
+    if (m.inviteDate) c.invited++;
+    if (m.invite!=='not_required' && !m.attend) c.pending++;
+    if (m.attend==='yes') c.yes++;
+    if (m.attend==='no') c.no++;
+  }
+  return c;
+}
+
+// ====== フィルタ ======
+function getFiltered(){
+  const q = STATE.search.trim().toLowerCase();
+  return STATE.members.filter(m => {
+    if (q) {
+      const hay = ((m.name||'') + ' ' + (m.org||'')).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    switch(STATE.filter){
+      case 'all': return true;
+      case 'invite_req': return m.invite!=='not_required';
+      case 'invite_skip': return m.invite==='not_required';
+      case 'invited': return !!m.inviteDate;
+      case 'pending': return m.invite!=='not_required' && !m.attend;
+      case 'yes': return m.attend==='yes';
+      case 'no': return m.attend==='no';
+    }
+    return true;
+  });
+}
+
+// ====== レンダ ======
+function render(){
+  buildTabs();
+  const items = getFiltered();
+  $('meta-count').innerHTML = `<strong>${items.length}</strong> 件 / 全 ${STATE.members.length} 件`;
+  if (!items.length){
+    $('list').innerHTML = `<div class="empty"><div class="empty-ico">⊘</div>該当するデータがありません</div>`;
+    return;
+  }
+  const html = items.map(m => {
+    const skClass = m.invite==='not_required' ? 'sk-skip' : (m.attend==='yes' ? 'sk-yes' : (m.attend==='no' ? 'sk-no' : ''));
+    const badges = [];
+    if (m.invite==='not_required') badges.push('<span class="badge b-skip">案内不要</span>');
+    if (m.inviteDate) badges.push(`<span class="badge b-done">案内済 ${m.inviteDate.slice(5)}</span>`);
+    if (m.attend==='yes') badges.push('<span class="badge b-yes">○ 出席</span>');
+    else if (m.attend==='no') badges.push('<span class="badge b-no">× 欠席</span>');
+    else if (m.invite!=='not_required') badges.push('<span class="badge b-pend">未返信</span>');
+    if (m.staff) badges.push(`<span class="badge">担当:${escapeHtml(m.staff)}</span>`);
+    return `<div class="card ${skClass}" data-id="${m.id}">
+      <div class="card-head">
+        <div>
+          <div class="card-name">${escapeHtml(m.name||'')}</div>
+          ${m.org?`<div class="card-org">${escapeHtml(m.org)}</div>`:''}
+        </div>
+      </div>
+      ${badges.length?`<div class="card-badges">${badges.join('')}</div>`:''}
+      ${m.memo?`<div class="card-org" style="margin-top:6px;font-style:italic">${escapeHtml(m.memo)}</div>`:''}
+      <div class="card-actions">
+        <button class="mini-btn" data-act="toggle-invite" data-id="${m.id}">${m.invite==='not_required'?'案内する':'案内不要に'}</button>
+        <button class="mini-btn primary" data-act="edit" data-id="${m.id}">編集</button>
+      </div>
+    </div>`;
+  }).join('');
+  $('list').innerHTML = html;
+  $('list').querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click', onCardAction));
+}
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+async function onCardAction(e){
+  const id = e.currentTarget.dataset.id;
+  const act = e.currentTarget.dataset.act;
+  const m = STATE.members.find(x=>x.id===id);
+  if (!m) return;
+  if (act==='edit'){ openEdit(m); }
+  else if (act==='toggle-invite'){
+    const next = m.invite==='not_required' ? 'required' : 'not_required';
+    try {
+      await updateDoc(doc(db,'members',id), {invite:next, updatedAt:serverTimestamp()});
+    } catch(e){ toast('更新失敗: '+e.code); }
+  }
+}
+
+// ====== 編集 ======
+function openEdit(m){
+  STATE.editingId = m ? m.id : null;
+  $('edit-title').textContent = m ? '編集' : '新規追加';
+  $('btn-delete').style.display = m ? 'block' : 'none';
+  $('f-name').value = m?.name || '';
+  $('f-org').value = m?.org || '';
+  $('f-invite').value = m?.invite || 'required';
+  $('f-attend').value = m?.attend || '';
+  $('f-staff').value = m?.staff || '';
+  $('f-invite-date').value = m?.inviteDate || '';
+  $('f-reply-date').value = m?.replyDate || '';
+  $('f-memo').value = m?.memo || '';
+  $('edit-modal').classList.add('show');
+}
+function closeEdit(){ $('edit-modal').classList.remove('show'); STATE.editingId=null; }
+$('edit-close').addEventListener('click', closeEdit);
+$('btn-cancel').addEventListener('click', closeEdit);
+$('edit-modal').addEventListener('click', e => { if(e.target.id==='edit-modal') closeEdit(); });
+
+$('btn-save').addEventListener('click', async ()=>{
+  const name = $('f-name').value.trim();
+  if (!name){ toast('氏名は必須です'); return; }
+  const data = {
+    name,
+    org: $('f-org').value.trim(),
+    invite: $('f-invite').value || 'required',
+    attend: $('f-attend').value,
+    staff: $('f-staff').value,
+    inviteDate: $('f-invite-date').value,
+    replyDate: $('f-reply-date').value,
+    memo: $('f-memo').value.trim(),
+    updatedAt: serverTimestamp()
+  };
+  try {
+    if (STATE.editingId){
+      await updateDoc(doc(db,'members',STATE.editingId), data);
+      toast('保存しました');
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db,'members'), data);
+      toast('追加しました');
+    }
+    closeEdit();
+  } catch(e){ toast('保存失敗: '+e.code); }
+});
+
+$('btn-delete').addEventListener('click', ()=>{
+  if (!STATE.editingId) return;
+  showConfirm(`「${$('f-name').value}」を削除しますか?`, async ()=>{
+    try {
+      await deleteDoc(doc(db,'members',STATE.editingId));
+      toast('削除しました');
+      closeEdit();
+    } catch(e){ toast('削除失敗: '+e.code); }
+  });
+});
+
+$('fab-add').addEventListener('click', ()=>openEdit(null));
+$('search').addEventListener('input', e => { STATE.search = e.target.value; render(); });
+
+// ====== メニュー ======
+$('btn-menu').addEventListener('click', ()=>$('menu-modal').classList.add('show'));
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click', ()=>{
+  b.closest('.modal').classList.remove('show');
+}));
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click', e=>{
+  if (e.target===m) m.classList.remove('show');
+}));
+
+$('menu-logout').addEventListener('click', ()=>{
+  sessionStorage.removeItem('pirili_pw');
+  location.reload();
+});
+
+// 集計
+$('menu-stats').addEventListener('click', ()=>{
+  $('menu-modal').classList.remove('show');
+  const c = computeCounts();
+  // 担当別集計
+  const byStaff = {};
+  STATE.members.forEach(m => {
+    if (m.invite==='not_required') return;
+    const s = m.staff || '(未割当)';
+    if (!byStaff[s]) byStaff[s] = {total:0, invited:0, yes:0, no:0, pending:0};
+    byStaff[s].total++;
+    if (m.inviteDate) byStaff[s].invited++;
+    if (m.attend==='yes') byStaff[s].yes++;
+    else if (m.attend==='no') byStaff[s].no++;
+    else byStaff[s].pending++;
+  });
+  let html = `<div style="margin-bottom:18px">
+    <div style="font-size:12px;color:var(--ink-mute);margin-bottom:6px">全体</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      <div style="background:var(--bg-2);padding:10px;border-radius:8px"><div style="font-size:11px;color:var(--ink-mute)">案内要</div><div style="font-size:20px;font-weight:700;color:var(--gold-deep)">${c.invite_req}</div></div>
+      <div style="background:var(--bg-2);padding:10px;border-radius:8px"><div style="font-size:11px;color:var(--ink-mute)">案内済</div><div style="font-size:20px;font-weight:700;color:var(--gold-deep)">${c.invited}</div></div>
+      <div style="background:#D9ECE2;padding:10px;border-radius:8px"><div style="font-size:11px;color:var(--ink-mute)">出席</div><div style="font-size:20px;font-weight:700;color:var(--ok)">${c.yes}</div></div>
+      <div style="background:#F3DCDC;padding:10px;border-radius:8px"><div style="font-size:11px;color:var(--ink-mute)">欠席</div><div style="font-size:20px;font-weight:700;color:var(--ng)">${c.no}</div></div>
+    </div>
+  </div>`;
+  html += '<div style="font-size:12px;color:var(--ink-mute);margin-bottom:6px">担当別</div>';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:var(--bg-2)"><th style="text-align:left;padding:7px">担当</th><th style="padding:7px">案内</th><th style="padding:7px">済</th><th style="padding:7px;color:var(--ok)">○</th><th style="padding:7px;color:var(--ng)">×</th><th style="padding:7px">未</th></tr></thead><tbody>';
+  Object.entries(byStaff).forEach(([k,v])=>{
+    html += `<tr style="border-bottom:1px solid var(--line-soft)"><td style="padding:7px">${escapeHtml(k)}</td><td style="text-align:center;padding:7px">${v.total}</td><td style="text-align:center;padding:7px">${v.invited}</td><td style="text-align:center;padding:7px;color:var(--ok)">${v.yes}</td><td style="text-align:center;padding:7px;color:var(--ng)">${v.no}</td><td style="text-align:center;padding:7px">${v.pending}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  $('stats-body').innerHTML = html;
+  $('stats-modal').classList.add('show');
+});
+
+// ====== Excel出力 ======
+$('menu-export-xlsx').addEventListener('click', async ()=>{
+  $('menu-modal').classList.remove('show');
+  const items = getFiltered();
+  if (!items.length){ toast('出力するデータがありません'); return; }
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('名簿');
+  ws.columns = [
+    {header:'No', key:'no', width:5},
+    {header:'氏名', key:'name', width:18},
+    {header:'所属', key:'org', width:30},
+    {header:'案内区分', key:'invite', width:9},
+    {header:'出欠', key:'attend', width:7},
+    {header:'案内担当', key:'staff', width:9},
+    {header:'案内日', key:'inviteDate', width:11},
+    {header:'返信日', key:'replyDate', width:11},
+    {header:'備考', key:'memo', width:24}
+  ];
+  ws.getRow(1).font = {bold:true, color:{argb:'FFFFFFFF'}, name:'メイリオ'};
+  ws.getRow(1).fill = {type:'pattern', pattern:'solid', fgColor:{argb:'FF8C6F2E'}};
+  ws.getRow(1).alignment = {vertical:'middle', horizontal:'center'};
+  ws.getRow(1).height = 22;
+  items.forEach((m,i)=>{
+    const att = m.attend==='yes'?'○':(m.attend==='no'?'×':'');
+    const inv = m.invite==='not_required'?'不要':'要';
+    ws.addRow({no:i+1, name:m.name||'', org:m.org||'', invite:inv, attend:att, staff:m.staff||'', inviteDate:m.inviteDate||'', replyDate:m.replyDate||'', memo:m.memo||''});
+  });
+  ws.eachRow(r=>{ r.font = r.font || {}; r.font.name = r.font.name || 'メイリオ'; });
+  ws.views = [{state:'frozen', ySplit:1}];
+  ws.autoFilter = {from:'A1', to:`I${items.length+1}`};
+  const buf = await wb.xlsx.writeBuffer();
+  const filterLabel = TABS.find(t=>t.key===STATE.filter)?.label || '';
+  saveAs(new Blob([buf]), `ピリリ会_${filterLabel}_${ymd()}.xlsx`);
+  toast('Excel出力しました');
+});
+
+// ====== PDF出力(window.print) ======
+$('menu-export-pdf').addEventListener('click', ()=>{
+  $('menu-modal').classList.remove('show');
+  const items = getFiltered();
+  if (!items.length){ toast('出力するデータがありません'); return; }
+  const filterLabel = TABS.find(t=>t.key===STATE.filter)?.label || '';
+  const today = ymd();
+  const rowsHtml = items.map((m,i)=>{
+    const att = m.attend==='yes'?'○':(m.attend==='no'?'×':'');
+    const inv = m.invite==='not_required'?'不要':'要';
+    return `<tr><td>${i+1}</td><td>${escapeHtml(m.name||'')}</td><td>${escapeHtml(m.org||'')}</td><td class="c">${inv}</td><td class="c att-${m.attend||''}">${att}</td><td class="c">${escapeHtml(m.staff||'')}</td><td class="c">${escapeHtml(m.inviteDate||'')}</td><td class="c">${escapeHtml(m.replyDate||'')}</td><td>${escapeHtml(m.memo||'')}</td></tr>`;
+  }).join('');
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>ピリリ会_${filterLabel}_${today}</title>
+<style>
+@page{size:A4;margin:5mm}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:"Hiragino Sans","Meiryo",sans-serif;font-size:12pt;color:#222}
+body{padding:2mm}
+h1{font-size:14pt;margin:0 0 2mm;color:#8C6F2E;border-bottom:2px solid #B8964A;padding-bottom:1mm}
+.meta{font-size:10pt;color:#666;margin-bottom:2mm;display:flex;justify-content:space-between}
+table{width:100%;border-collapse:collapse;font-size:12pt}
+th,td{border:1px solid #999;padding:2px 4px;vertical-align:middle;line-height:1.3}
+th{background:#EFE6CC;color:#5A4F42;font-weight:700;text-align:center}
+td.c{text-align:center}
+td.att-yes{color:#2E7D5B;font-weight:700}
+td.att-no{color:#B14848;font-weight:700}
+tr:nth-child(even){background:#FBF7EC}
+@media print{button{display:none}body{padding:0}}
+.print-btn{position:fixed;top:10px;right:10px;padding:8px 16px;background:#8C6F2E;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer}
+</style></head><body>
+<button class="print-btn" onclick="window.print()">印刷 / PDF保存</button>
+<h1>ピリリ会パーティー ${filterLabel}名簿</h1>
+<div class="meta"><span>テレビせとうち 取締役相談役 土井雅人さん ご勇退記念パーティー(2026/7/2)</span><span>${items.length}件 / 出力日:${today}</span></div>
+<table><thead><tr><th style="width:6%">No</th><th style="width:13%">氏名</th><th style="width:20%">所属</th><th style="width:7%">案内</th><th style="width:6%">出欠</th><th style="width:9%">担当</th><th style="width:10%">案内日</th><th style="width:10%">返信日</th><th>備考</th></tr></thead>
+<tbody>${rowsHtml}</tbody></table>
+<script>setTimeout(()=>window.print(), 400)<\/script>
+</body></html>`);
+  w.document.close();
+});
+
+// ====== ユーティリティ ======
+function ymd(){
+  const d = new Date();
+  return d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2);
+}
+function showConfirm(msg, onYes){
+  $('confirm-msg').textContent = msg;
+  $('confirm-modal').classList.add('show');
+  $('confirm-yes').onclick = ()=>{ $('confirm-modal').classList.remove('show'); onYes(); };
+  $('confirm-no').onclick = ()=>$('confirm-modal').classList.remove('show');
+}
+
+// ====== 起動 ======
+// 同セッション内ならパスワードを保持して自動再ログイン
+window.addEventListener('load', ()=>{
+  const cachedPw = sessionStorage.getItem('pirili_pw');
+  if (cachedPw){
+    tryLogin(cachedPw);
+  }
+});
+// パスワード成功時にセッションへ保存(tryLogin内のセット箇所も併用)
+</script>
+</body>
+</html>
