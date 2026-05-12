@@ -42,7 +42,6 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 button{cursor:pointer;border:none;background:none}
 input,select,textarea{outline:none}
 
-/* === ログイン === */
 #login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg);z-index:1000}
 .login-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:32px 24px;width:100%;max-width:340px;box-shadow:var(--shadow-lg);text-align:center}
 .login-title{font-family:"Noto Serif JP",serif;font-size:22px;font-weight:700;color:var(--gold-deep);margin:0 0 6px}
@@ -52,7 +51,6 @@ input,select,textarea{outline:none}
 .login-card button:disabled{opacity:0.5}
 .login-err{color:var(--ng);font-size:12px;margin:8px 0 0;min-height:16px}
 
-/* === ヘッダ === */
 header{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 14px}
 .header-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .brand{font-family:"Noto Serif JP",serif;font-weight:700;color:var(--gold-deep);font-size:16px;letter-spacing:0.02em;line-height:1.2}
@@ -64,7 +62,6 @@ header{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.96);backdr
 .icon-btn{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--line);font-size:18px;color:var(--gold-deep)}
 .icon-btn:active{transform:scale(0.94)}
 
-/* === タブ === */
 .tabs-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:10px;padding-bottom:2px}
 .tabs-wrap::-webkit-scrollbar{display:none}
 .tabs{display:inline-flex;gap:4px;white-space:nowrap;padding:0 1px}
@@ -72,45 +69,97 @@ header{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.96);backdr
 .tab.active{background:var(--gold-deep);color:#fff;border-color:var(--gold-deep);font-weight:700}
 .tab .count{font-size:11px;opacity:0.85;font-variant-numeric:tabular-nums}
 
-/* === 検索 === */
+.tabs-label{font-size:10px;color:var(--ink-mute);letter-spacing:0.08em;margin:8px 2px 2px;font-weight:500}
+.staff-tabs-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.staff-tabs-wrap::-webkit-scrollbar{display:none}
+.staff-tabs{display:inline-flex;gap:4px;white-space:nowrap;padding:0 1px}
+.staff-tab{padding:6px 12px;border-radius:999px;background:transparent;border:1px dashed var(--line);font-size:12px;color:var(--ink-soft);font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s}
+.staff-tab.active{background:var(--gold);color:#fff;border:1px solid var(--gold);font-weight:700}
+.staff-tab .count{font-size:10.5px;opacity:0.85;font-variant-numeric:tabular-nums}
+
 .search-bar{display:flex;gap:8px;margin-top:9px;align-items:center}
 .search-bar input{flex:1;padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px}
 
-/* === リスト === */
 main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
-.list-meta{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;font-size:12px;color:var(--ink-mute)}
+.list-meta{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;font-size:12px;color:var(--ink-mute);gap:8px}
 .list-meta strong{color:var(--gold-deep);font-size:13px;font-weight:700}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:8px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.help-bar{font-size:11px;color:var(--ink-mute);line-height:1.5;text-align:right}
+
+/* === カード === */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:11px;margin-bottom:8px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:box-shadow 0.2s}
 .card.sk-yes{border-left:4px solid var(--ok)}
 .card.sk-no{border-left:4px solid var(--ng)}
-.card.sk-skip{border-left:4px solid var(--ink-mute);opacity:0.78}
-.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card.sk-skip{border-left:4px solid var(--ink-mute);opacity:0.82}
+.card.expanded{box-shadow:var(--shadow-lg)}
+.card.expanded.sk-skip{opacity:1}
+
+.card-summary{padding:11px 13px;display:flex;align-items:flex-start;gap:11px;cursor:pointer}
+.card-summary:active{background:rgba(184,150,74,0.04)}
+
+/* トグル */
+.toggle{flex:0 0 auto;position:relative;width:50px;height:28px;display:inline-block;margin-top:2px}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:#D5C9A8;border-radius:999px;transition:background 0.22s;cursor:pointer}
+.toggle-slider::before{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:transform 0.22s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.toggle input:checked + .toggle-slider{background:var(--gold)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(22px)}
+.toggle-label{position:absolute;top:50%;transform:translateY(-50%);font-size:9px;font-weight:700;color:#fff;letter-spacing:0.03em;pointer-events:none;line-height:1}
+.toggle-label.on{left:6px;opacity:0}
+.toggle-label.off{right:5px;opacity:1}
+.toggle input:checked ~ .toggle-label.on{opacity:1}
+.toggle input:checked ~ .toggle-label.off{opacity:0}
+
+.card-main{flex:1;min-width:0}
 .card-name{font-weight:700;font-size:16px;color:var(--ink);line-height:1.3}
 .card-org{font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.35}
 .card-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
 .badge{font-size:10.5px;padding:2px 7px;border-radius:999px;background:var(--bg-2);color:var(--ink-soft);font-weight:500;letter-spacing:0.02em}
 .badge.b-skip{background:#EAE3D2;color:var(--ink-mute)}
+.badge.b-req{background:#F7E6C7;color:#8C6A1B}
 .badge.b-done{background:#E5EFD9;color:#5C7A2A}
 .badge.b-yes{background:#D9ECE2;color:var(--ok)}
 .badge.b-no{background:#F3DCDC;color:var(--ng)}
 .badge.b-pend{background:#F7E6C7;color:#8C6A1B}
-.card-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
-.mini-btn{flex:1;min-width:75px;padding:7px 8px;border-radius:8px;background:#fff;border:1px solid var(--line);font-size:12.5px;color:var(--ink-soft);font-weight:500}
-.mini-btn:active{background:var(--bg-2)}
-.mini-btn.primary{background:var(--gold);color:#fff;border-color:var(--gold)}
+.badge.b-staff{background:#EFE2C2;color:var(--gold-deep);font-weight:700}
 
-/* === FAB === */
+.card-caret{flex:0 0 auto;color:var(--ink-mute);font-size:14px;margin-top:6px;transition:transform 0.2s}
+.card.expanded .card-caret{transform:rotate(180deg)}
+
+/* インライン編集 */
+.card-detail{display:none;padding:0 13px 14px;border-top:1px dashed var(--line-soft);animation:expand 0.22s ease-out}
+.card.expanded .card-detail{display:block}
+@keyframes expand{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.detail-section{margin-top:12px}
+.detail-section-label{display:block;font-size:11px;color:var(--ink-mute);margin-bottom:5px;letter-spacing:0.04em;font-weight:600}
+.detail-input,.detail-select,.detail-textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:14px}
+.detail-textarea{min-height:56px;resize:vertical}
+.detail-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.seg button{flex:1;padding:9px 6px;background:transparent;font-size:13px;color:var(--ink-soft);font-weight:500;border-right:1px solid var(--line);transition:all 0.15s}
+.seg button:last-child{border-right:none}
+.seg button.active{font-weight:700}
+.seg button.active[data-val=""]{background:var(--bg-2);color:var(--ink-soft)}
+.seg button.active[data-val="yes"]{background:#D9ECE2;color:var(--ok)}
+.seg button.active[data-val="no"]{background:#F3DCDC;color:var(--ng)}
+
+.detail-actions{display:flex;gap:8px;margin-top:14px}
+.detail-btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;letter-spacing:0.02em;transition:all 0.15s}
+.detail-btn.save{background:var(--gold-deep);color:#fff}
+.detail-btn.save:disabled{background:#C8B888;cursor:default}
+.detail-btn.cancel{background:#fff;color:var(--ink-soft);border:1px solid var(--line)}
+.detail-btn.delete{background:#fff;color:var(--ng);border:1px solid #E8C7C7}
+
 .fab{position:fixed;right:18px;bottom:22px;width:56px;height:56px;border-radius:50%;background:var(--gold-deep);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(140,111,46,0.4);z-index:40;font-weight:300;line-height:1}
 .fab:active{transform:scale(0.92)}
 
-/* === モーダル === */
 .modal{position:fixed;inset:0;background:rgba(43,38,32,0.55);z-index:200;display:none;align-items:flex-end;justify-content:center}
 .modal.show{display:flex;animation:fadein 0.2s}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 .sheet{background:var(--paper);width:100%;max-width:560px;max-height:92vh;border-radius:16px 16px 0 0;overflow-y:auto;animation:slideup 0.25s cubic-bezier(0.2,0.9,0.3,1)}
 @media(min-width:560px){.modal{align-items:center}.sheet{border-radius:16px;max-height:88vh}}
 @keyframes slideup{from{transform:translateY(40px);opacity:0.6}to{transform:translateY(0);opacity:1}}
-.sheet-head{position:sticky;top:0;background:var(--paper);padding:14px 18px 10px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center}
+.sheet-head{position:sticky;top:0;background:var(--paper);padding:14px 18px 10px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;z-index:1}
 .sheet-title{font-family:"Noto Serif JP",serif;font-size:17px;font-weight:700;color:var(--gold-deep)}
 .sheet-close{font-size:24px;color:var(--ink-mute);width:32px;height:32px;line-height:1}
 .sheet-body{padding:14px 18px 22px}
@@ -123,9 +172,7 @@ main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
 .btn{flex:1;padding:12px;border-radius:9px;font-weight:700;font-size:14px;letter-spacing:0.04em}
 .btn.primary{background:var(--gold-deep);color:#fff}
 .btn.secondary{background:#fff;color:var(--ink-soft);border:1px solid var(--line)}
-.btn.danger{background:#fff;color:var(--ng);border:1px solid #E8C7C7}
 
-/* メニュー */
 .menu-list{list-style:none;padding:0;margin:0}
 .menu-list li{padding:14px 18px;border-bottom:1px solid var(--line-soft);font-size:15px;display:flex;align-items:center;gap:10px;color:var(--ink)}
 .menu-list li:active{background:var(--bg-2)}
@@ -133,23 +180,19 @@ main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
 .menu-list li .ico{font-size:18px;width:24px;text-align:center}
 .menu-list li.danger{color:var(--ng)}
 
-/* トースト */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;box-shadow:var(--shadow-lg)}
 .toast.show{opacity:1}
 
-/* ローディング */
 .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--ink-mute);font-size:13px}
 .empty{text-align:center;padding:50px 20px;color:var(--ink-mute);font-size:13px}
 .empty-ico{font-size:34px;margin-bottom:10px;opacity:0.5}
 
-/* 確認ダイアログ */
 .confirm-box{padding:22px 20px;text-align:center}
 .confirm-msg{font-size:15px;margin-bottom:18px;color:var(--ink);line-height:1.6}
 </style>
 </head>
 <body>
 
-<!-- ログイン画面 -->
 <div id="login-screen">
   <div class="login-card">
     <h1 class="login-title">ピリリ会</h1>
@@ -160,7 +203,6 @@ main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
   </div>
 </div>
 
-<!-- メインアプリ -->
 <div id="app" style="display:none">
   <header>
     <div class="header-top">
@@ -172,18 +214,16 @@ main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
         <button class="icon-btn" id="btn-menu" aria-label="メニュー">⋯</button>
       </div>
     </div>
-    <div class="tabs-wrap">
-      <div class="tabs" id="tabs"></div>
-    </div>
-    <div class="search-bar">
-      <input type="text" id="search" placeholder="氏名・所属で検索">
-    </div>
+    <div class="tabs-wrap"><div class="tabs" id="tabs"></div></div>
+    <div class="tabs-label">担当者</div>
+    <div class="staff-tabs-wrap"><div class="staff-tabs" id="staff-tabs"></div></div>
+    <div class="search-bar"><input type="text" id="search" placeholder="氏名・所属で検索"></div>
   </header>
 
   <main>
     <div class="list-meta">
       <span id="meta-count">—</span>
-      <span id="meta-sync"></span>
+      <span class="help-bar">タップで詳細 / トグルで案内要・不要</span>
     </div>
     <div id="list"><div class="loading">読み込み中…</div></div>
   </main>
@@ -191,40 +231,31 @@ main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
   <button class="fab" id="fab-add" aria-label="追加">＋</button>
 </div>
 
-<!-- 編集モーダル -->
+<!-- 新規追加モーダル -->
 <div class="modal" id="edit-modal">
   <div class="sheet">
     <div class="sheet-head">
-      <div class="sheet-title" id="edit-title">編集</div>
+      <div class="sheet-title">新規追加</div>
       <button class="sheet-close" id="edit-close">×</button>
     </div>
     <div class="sheet-body">
-      <div class="field">
-        <label>氏名 *</label>
-        <input type="text" id="f-name" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>所属</label>
-        <input type="text" id="f-org" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>案内区分</label>
+      <div class="field"><label>氏名 *</label><input type="text" id="f-name" autocomplete="off"></div>
+      <div class="field"><label>所属</label><input type="text" id="f-org" autocomplete="off"></div>
+      <div class="field"><label>案内区分</label>
         <select id="f-invite">
           <option value="required">案内要</option>
           <option value="not_required">案内不要</option>
         </select>
       </div>
       <div class="field-row">
-        <div class="field">
-          <label>出欠</label>
+        <div class="field"><label>出欠</label>
           <select id="f-attend">
             <option value="">未選択</option>
             <option value="yes">○ 出席</option>
             <option value="no">× 欠席</option>
           </select>
         </div>
-        <div class="field">
-          <label>案内担当</label>
+        <div class="field"><label>案内担当</label>
           <select id="f-staff">
             <option value="">未選択</option>
             <option value="土井">土井</option>
@@ -236,35 +267,21 @@ main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
         </div>
       </div>
       <div class="field-row">
-        <div class="field">
-          <label>案内日</label>
-          <input type="date" id="f-invite-date">
-        </div>
-        <div class="field">
-          <label>返信日</label>
-          <input type="date" id="f-reply-date">
-        </div>
+        <div class="field"><label>案内日</label><input type="date" id="f-invite-date"></div>
+        <div class="field"><label>返信日</label><input type="date" id="f-reply-date"></div>
       </div>
-      <div class="field">
-        <label>備考</label>
-        <textarea id="f-memo" rows="2"></textarea>
-      </div>
+      <div class="field"><label>備考</label><textarea id="f-memo" rows="2"></textarea></div>
       <div class="btn-row">
-        <button class="btn danger" id="btn-delete" style="display:none">削除</button>
         <button class="btn secondary" id="btn-cancel">キャンセル</button>
-        <button class="btn primary" id="btn-save">保存</button>
+        <button class="btn primary" id="btn-save">追加</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- メニューモーダル -->
 <div class="modal" id="menu-modal">
   <div class="sheet">
-    <div class="sheet-head">
-      <div class="sheet-title">メニュー</div>
-      <button class="sheet-close" data-close>×</button>
-    </div>
+    <div class="sheet-head"><div class="sheet-title">メニュー</div><button class="sheet-close" data-close>×</button></div>
     <ul class="menu-list">
       <li id="menu-export-xlsx"><span class="ico">📊</span> 現在のタブをExcel出力</li>
       <li id="menu-export-pdf"><span class="ico">📄</span> 現在のタブをPDF出力</li>
@@ -274,18 +291,13 @@ main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
   </div>
 </div>
 
-<!-- 集計モーダル -->
 <div class="modal" id="stats-modal">
   <div class="sheet">
-    <div class="sheet-head">
-      <div class="sheet-title">集計</div>
-      <button class="sheet-close" data-close>×</button>
-    </div>
+    <div class="sheet-head"><div class="sheet-title">集計</div><button class="sheet-close" data-close>×</button></div>
     <div class="sheet-body" id="stats-body"></div>
   </div>
 </div>
 
-<!-- 確認モーダル -->
 <div class="modal" id="confirm-modal">
   <div class="sheet" style="max-width:340px">
     <div class="confirm-box">
@@ -300,13 +312,11 @@ main{padding:8px 12px 100px;max-width:760px;margin:0 auto}
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-// ===== Firebase 設定 (★置き換えてください) =====
 const firebaseConfig = {
   apiKey: "AIzaSyCLGL87Y12LXrvKV7Bsh-MYvqwgRlzBKlk",
   authDomain: "doiparty.firebaseapp.com",
@@ -315,7 +325,6 @@ const firebaseConfig = {
   messagingSenderId: "337326628",
   appId: "1:337326628:web:a88038549a1b97a7271eb1"
 };
-// ===============================================
 
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
@@ -324,8 +333,10 @@ const db = getFirestore(fbApp);
 const STATE = {
   members:[],
   filter:'all',
+  staffFilter:'all',
   search:'',
-  editingId:null,
+  expandedId:null,
+  draft:{},
   unsub:null,
   authedPw:null
 };
@@ -340,20 +351,27 @@ const TABS = [
   {key:'no', label:'欠席'}
 ];
 
+const STAFF_TABS = [
+  {key:'all', label:'全担当'},
+  {key:'土井', label:'土井'},
+  {key:'仮谷', label:'仮谷'},
+  {key:'TSC', label:'TSC'},
+  {key:'石川', label:'石川'},
+  {key:'その他', label:'その他'},
+  {key:'__unassigned__', label:'未割当'}
+];
+
 const $ = id => document.getElementById(id);
 const toast = (msg) => {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(t._tid); t._tid = setTimeout(()=>t.classList.remove('show'), 1800);
 };
 
-// ====== ログイン ======
 async function tryLogin(pw){
   $('login-err').textContent = '';
   $('login-btn').disabled = true;
   try {
-    // 匿名認証
     await signInAnonymously(auth);
-    // パスワードドキュメントを読みに行く(Firestoreルールで読み込みは認証済みなら許可)
     const pwDoc = await getDoc(doc(db, 'config', 'access'));
     if (!pwDoc.exists()) {
       $('login-err').textContent = '初期設定が完了していません';
@@ -377,7 +395,6 @@ async function tryLogin(pw){
 $('login-btn').addEventListener('click', ()=>tryLogin($('pw-input').value));
 $('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin($('pw-input').value); });
 
-// ====== Firestore リアルタイム購読 ======
 function startSync(){
   const colRef = collection(db, 'members');
   STATE.unsub = onSnapshot(colRef, snap => {
@@ -386,6 +403,7 @@ function startSync(){
     items.sort((a,b)=>(a.name||'').localeCompare(b.name||'','ja'));
     STATE.members = items;
     $('sync-dot').classList.remove('off');
+    // 展開中のカードがあるなら、ドラフトに保存後の値を反映(他者更新時に上書きしない)
     render();
   }, err => {
     console.error('Sync error', err);
@@ -394,17 +412,24 @@ function startSync(){
   });
 }
 
-// ====== タブ ======
 function buildTabs(){
-  const counts = computeCounts();
+  const counts = computeCounts(getStaffFiltered());
   $('tabs').innerHTML = TABS.map(t=>`<button class="tab ${STATE.filter===t.key?'active':''}" data-tab="${t.key}">${t.label}<span class="count">${counts[t.key]}</span></button>`).join('');
   $('tabs').querySelectorAll('.tab').forEach(b=>b.addEventListener('click', ()=>{
-    STATE.filter = b.dataset.tab; render();
+    STATE.filter = b.dataset.tab; STATE.expandedId = null; render();
+  }));
+
+  const staffCounts = computeStaffCounts();
+  $('staff-tabs').innerHTML = STAFF_TABS.map(t=>`<button class="staff-tab ${STATE.staffFilter===t.key?'active':''}" data-staff="${t.key}">${t.label}<span class="count">${staffCounts[t.key]||0}</span></button>`).join('');
+  $('staff-tabs').querySelectorAll('.staff-tab').forEach(b=>b.addEventListener('click', ()=>{
+    STATE.staffFilter = b.dataset.staff; STATE.expandedId = null; render();
   }));
 }
-function computeCounts(){
+
+function computeCounts(source){
+  source = source || STATE.members;
   const c = {all:0,invite_req:0,invite_skip:0,invited:0,pending:0,yes:0,no:0};
-  for (const m of STATE.members){
+  for (const m of source){
     c.all++;
     if (m.invite==='not_required') c.invite_skip++;
     else c.invite_req++;
@@ -416,10 +441,28 @@ function computeCounts(){
   return c;
 }
 
-// ====== フィルタ ======
+function computeStaffCounts(){
+  const c = {all:STATE.members.length};
+  STAFF_TABS.forEach(t => { if(t.key!=='all') c[t.key]=0; });
+  for (const m of STATE.members){
+    const s = m.staff || '__unassigned__';
+    if (c[s] !== undefined) c[s]++;
+    else c['その他']++;
+  }
+  return c;
+}
+
+function getStaffFiltered(){
+  if (STATE.staffFilter==='all') return STATE.members;
+  if (STATE.staffFilter==='__unassigned__'){
+    return STATE.members.filter(m => !m.staff);
+  }
+  return STATE.members.filter(m => m.staff===STATE.staffFilter);
+}
+
 function getFiltered(){
   const q = STATE.search.trim().toLowerCase();
-  return STATE.members.filter(m => {
+  return getStaffFiltered().filter(m => {
     if (q) {
       const hay = ((m.name||'') + ' ' + (m.org||'')).toLowerCase();
       if (!hay.includes(q)) return false;
@@ -437,78 +480,252 @@ function getFiltered(){
   });
 }
 
-// ====== レンダ ======
 function render(){
   buildTabs();
   const items = getFiltered();
-  $('meta-count').innerHTML = `<strong>${items.length}</strong> 件 / 全 ${STATE.members.length} 件`;
+  const total = getStaffFiltered().length;
+  const staffLabel = STATE.staffFilter==='all' ? '' :
+    (STATE.staffFilter==='__unassigned__' ? '【未割当】 ' : `【${STATE.staffFilter}】 `);
+  $('meta-count').innerHTML = `${staffLabel}<strong>${items.length}</strong> 件 / ${total} 件`;
+
   if (!items.length){
     $('list').innerHTML = `<div class="empty"><div class="empty-ico">⊘</div>該当するデータがありません</div>`;
     return;
   }
-  const html = items.map(m => {
-    const skClass = m.invite==='not_required' ? 'sk-skip' : (m.attend==='yes' ? 'sk-yes' : (m.attend==='no' ? 'sk-no' : ''));
-    const badges = [];
-    if (m.invite==='not_required') badges.push('<span class="badge b-skip">案内不要</span>');
-    if (m.inviteDate) badges.push(`<span class="badge b-done">案内済 ${m.inviteDate.slice(5)}</span>`);
-    if (m.attend==='yes') badges.push('<span class="badge b-yes">○ 出席</span>');
-    else if (m.attend==='no') badges.push('<span class="badge b-no">× 欠席</span>');
-    else if (m.invite!=='not_required') badges.push('<span class="badge b-pend">未返信</span>');
-    if (m.staff) badges.push(`<span class="badge">担当:${escapeHtml(m.staff)}</span>`);
-    return `<div class="card ${skClass}" data-id="${m.id}">
-      <div class="card-head">
-        <div>
-          <div class="card-name">${escapeHtml(m.name||'')}</div>
-          ${m.org?`<div class="card-org">${escapeHtml(m.org)}</div>`:''}
+  $('list').innerHTML = items.map(renderCard).join('');
+  bindCardEvents();
+}
+
+function renderCard(m){
+  const isReq = m.invite !== 'not_required';
+  const skClass = !isReq ? 'sk-skip' : (m.attend==='yes' ? 'sk-yes' : (m.attend==='no' ? 'sk-no' : ''));
+  const isExpanded = STATE.expandedId === m.id;
+
+  const badges = [];
+  if (!isReq) badges.push('<span class="badge b-skip">案内不要</span>');
+  else badges.push('<span class="badge b-req">案内要</span>');
+  if (m.inviteDate) badges.push(`<span class="badge b-done">案内済 ${m.inviteDate.slice(5)}</span>`);
+  if (m.attend==='yes') badges.push('<span class="badge b-yes">○ 出席</span>');
+  else if (m.attend==='no') badges.push('<span class="badge b-no">× 欠席</span>');
+  else if (isReq && m.inviteDate) badges.push('<span class="badge b-pend">未返信</span>');
+  if (m.staff) badges.push(`<span class="badge b-staff">担当:${escapeHtml(m.staff)}</span>`);
+
+  let detailHtml = '';
+  if (isExpanded){
+    const d = STATE.draft;
+    detailHtml = `
+      <div class="card-detail">
+        <div class="detail-section">
+          <label class="detail-section-label">氏名 *</label>
+          <input class="detail-input" data-f="name" type="text" value="${escapeAttr(d.name||'')}">
         </div>
-      </div>
-      ${badges.length?`<div class="card-badges">${badges.join('')}</div>`:''}
-      ${m.memo?`<div class="card-org" style="margin-top:6px;font-style:italic">${escapeHtml(m.memo)}</div>`:''}
-      <div class="card-actions">
-        <button class="mini-btn" data-act="toggle-invite" data-id="${m.id}">${m.invite==='not_required'?'案内する':'案内不要に'}</button>
-        <button class="mini-btn primary" data-act="edit" data-id="${m.id}">編集</button>
-      </div>
-    </div>`;
-  }).join('');
-  $('list').innerHTML = html;
-  $('list').querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click', onCardAction));
-}
-
-function escapeHtml(s){return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-
-async function onCardAction(e){
-  const id = e.currentTarget.dataset.id;
-  const act = e.currentTarget.dataset.act;
-  const m = STATE.members.find(x=>x.id===id);
-  if (!m) return;
-  if (act==='edit'){ openEdit(m); }
-  else if (act==='toggle-invite'){
-    const next = m.invite==='not_required' ? 'required' : 'not_required';
-    try {
-      await updateDoc(doc(db,'members',id), {invite:next, updatedAt:serverTimestamp()});
-    } catch(e){ toast('更新失敗: '+e.code); }
+        <div class="detail-section">
+          <label class="detail-section-label">所属</label>
+          <input class="detail-input" data-f="org" type="text" value="${escapeAttr(d.org||'')}">
+        </div>
+        <div class="detail-section">
+          <label class="detail-section-label">出欠</label>
+          <div class="seg" data-seg="attend">
+            <button data-val="" class="${(d.attend||'')===''?'active':''}">未選択</button>
+            <button data-val="yes" class="${d.attend==='yes'?'active':''}">○ 出席</button>
+            <button data-val="no" class="${d.attend==='no'?'active':''}">× 欠席</button>
+          </div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-section">
+            <label class="detail-section-label">案内担当</label>
+            <select class="detail-select" data-f="staff">
+              <option value="" ${!d.staff?'selected':''}>未選択</option>
+              <option value="土井" ${d.staff==='土井'?'selected':''}>土井</option>
+              <option value="仮谷" ${d.staff==='仮谷'?'selected':''}>仮谷</option>
+              <option value="TSC" ${d.staff==='TSC'?'selected':''}>TSC</option>
+              <option value="石川" ${d.staff==='石川'?'selected':''}>石川</option>
+              <option value="その他" ${d.staff==='その他'?'selected':''}>その他</option>
+            </select>
+          </div>
+          <div class="detail-section">
+            <label class="detail-section-label">案内区分</label>
+            <select class="detail-select" data-f="invite">
+              <option value="required" ${(d.invite||'required')==='required'?'selected':''}>案内要</option>
+              <option value="not_required" ${d.invite==='not_required'?'selected':''}>案内不要</option>
+            </select>
+          </div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-section">
+            <label class="detail-section-label">案内日</label>
+            <input class="detail-input" data-f="inviteDate" type="date" value="${escapeAttr(d.inviteDate||'')}">
+          </div>
+          <div class="detail-section">
+            <label class="detail-section-label">返信日</label>
+            <input class="detail-input" data-f="replyDate" type="date" value="${escapeAttr(d.replyDate||'')}">
+          </div>
+        </div>
+        <div class="detail-section">
+          <label class="detail-section-label">備考</label>
+          <textarea class="detail-textarea" data-f="memo" rows="2">${escapeHtml(d.memo||'')}</textarea>
+        </div>
+        <div class="detail-actions">
+          <button class="detail-btn delete" data-act="delete">削除</button>
+          <button class="detail-btn cancel" data-act="cancel">キャンセル</button>
+          <button class="detail-btn save" data-act="save">保存</button>
+        </div>
+      </div>`;
   }
+
+  return `<div class="card ${skClass} ${isExpanded?'expanded':''}" data-id="${m.id}">
+    <div class="card-summary" data-act="expand">
+      <label class="toggle" data-act="toggle-wrap">
+        <input type="checkbox" data-act="toggle-invite" ${isReq?'checked':''}>
+        <span class="toggle-slider"></span>
+        <span class="toggle-label on">案内</span>
+        <span class="toggle-label off">不要</span>
+      </label>
+      <div class="card-main">
+        <div class="card-name">${escapeHtml(m.name||'')}</div>
+        ${m.org?`<div class="card-org">${escapeHtml(m.org)}</div>`:''}
+        <div class="card-badges">${badges.join('')}</div>
+        ${m.memo && !isExpanded?`<div class="card-org" style="margin-top:6px;font-style:italic">${escapeHtml(m.memo)}</div>`:''}
+      </div>
+      <span class="card-caret">▾</span>
+    </div>
+    ${detailHtml}
+  </div>`;
 }
 
-// ====== 編集 ======
-function openEdit(m){
-  STATE.editingId = m ? m.id : null;
-  $('edit-title').textContent = m ? '編集' : '新規追加';
-  $('btn-delete').style.display = m ? 'block' : 'none';
-  $('f-name').value = m?.name || '';
-  $('f-org').value = m?.org || '';
-  $('f-invite').value = m?.invite || 'required';
-  $('f-attend').value = m?.attend || '';
-  $('f-staff').value = m?.staff || '';
-  $('f-invite-date').value = m?.inviteDate || '';
-  $('f-reply-date').value = m?.replyDate || '';
-  $('f-memo').value = m?.memo || '';
+function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function escapeAttr(s){return escapeHtml(s)}
+
+function bindCardEvents(){
+  // トグルラベル(クリック伝搬を止める)
+  $('list').querySelectorAll('[data-act="toggle-wrap"]').forEach(el=>{
+    el.addEventListener('click', e => e.stopPropagation());
+  });
+
+  // カード展開(サマリー部分タップ)
+  $('list').querySelectorAll('[data-act="expand"]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      // トグル領域のクリックは除外(上のstopPropagationで既に止まっている)
+      const card = el.closest('.card');
+      const id = card.dataset.id;
+      if (STATE.expandedId === id){
+        STATE.expandedId = null;
+        STATE.draft = {};
+      } else {
+        const m = STATE.members.find(x=>x.id===id);
+        STATE.expandedId = id;
+        STATE.draft = m ? {...m} : {};
+      }
+      render();
+    });
+  });
+
+  // トグル(案内要/不要)
+  $('list').querySelectorAll('input[data-act="toggle-invite"]').forEach(el=>{
+    el.addEventListener('change', async e => {
+      e.stopPropagation();
+      const card = el.closest('.card');
+      const id = card.dataset.id;
+      const m = STATE.members.find(x=>x.id===id);
+      if (!m) return;
+      const next = el.checked ? 'required' : 'not_required';
+      try {
+        await updateDoc(doc(db,'members',id), {invite:next, updatedAt:serverTimestamp()});
+        toast(next==='required' ? '案内対象にしました' : '案内不要にしました');
+      } catch(err){
+        toast('更新失敗: '+err.code);
+        el.checked = !el.checked;
+      }
+    });
+  });
+
+  // インライン編集 入力反映
+  $('list').querySelectorAll('.card-detail [data-f]').forEach(el=>{
+    const handler = ()=>{ STATE.draft[el.dataset.f] = el.value; };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+
+  // 出欠セグメント
+  $('list').querySelectorAll('.seg button').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const seg = btn.closest('.seg');
+      STATE.draft[seg.dataset.seg] = btn.dataset.val;
+      seg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // 保存・キャンセル・削除
+  $('list').querySelectorAll('.detail-btn').forEach(btn=>{
+    btn.addEventListener('click', async e=>{
+      const act = btn.dataset.act;
+      const card = btn.closest('.card');
+      const id = card.dataset.id;
+      if (act==='cancel'){
+        STATE.expandedId = null;
+        STATE.draft = {};
+        render();
+      } else if (act==='save'){
+        const d = STATE.draft;
+        const name = (d.name||'').trim();
+        if (!name){ toast('氏名は必須です'); return; }
+        const data = {
+          name,
+          org: (d.org||'').trim(),
+          invite: d.invite || 'required',
+          attend: d.attend || '',
+          staff: d.staff || '',
+          inviteDate: d.inviteDate || '',
+          replyDate: d.replyDate || '',
+          memo: (d.memo||'').trim(),
+          updatedAt: serverTimestamp()
+        };
+        btn.disabled = true;
+        try {
+          await updateDoc(doc(db,'members',id), data);
+          toast('保存しました');
+          STATE.expandedId = null;
+          STATE.draft = {};
+        } catch(err){
+          toast('保存失敗: '+err.code);
+          btn.disabled = false;
+        }
+      } else if (act==='delete'){
+        const name = STATE.draft.name || '';
+        showConfirm(`「${name}」を削除しますか?`, async ()=>{
+          try {
+            await deleteDoc(doc(db,'members',id));
+            toast('削除しました');
+            STATE.expandedId = null;
+            STATE.draft = {};
+          } catch(err){ toast('削除失敗: '+err.code); }
+        });
+      }
+    });
+  });
+}
+
+// ====== 新規追加 ======
+function openAddModal(){
+  $('f-name').value = '';
+  $('f-org').value = '';
+  $('f-invite').value = 'required';
+  $('f-attend').value = '';
+  let defaultStaff = '';
+  if (STATE.staffFilter!=='all' && STATE.staffFilter!=='__unassigned__'){
+    defaultStaff = STATE.staffFilter;
+  }
+  $('f-staff').value = defaultStaff;
+  $('f-invite-date').value = '';
+  $('f-reply-date').value = '';
+  $('f-memo').value = '';
   $('edit-modal').classList.add('show');
 }
-function closeEdit(){ $('edit-modal').classList.remove('show'); STATE.editingId=null; }
-$('edit-close').addEventListener('click', closeEdit);
-$('btn-cancel').addEventListener('click', closeEdit);
-$('edit-modal').addEventListener('click', e => { if(e.target.id==='edit-modal') closeEdit(); });
+function closeAddModal(){ $('edit-modal').classList.remove('show'); }
+$('edit-close').addEventListener('click', closeAddModal);
+$('btn-cancel').addEventListener('click', closeAddModal);
+$('edit-modal').addEventListener('click', e => { if(e.target.id==='edit-modal') closeAddModal(); });
 
 $('btn-save').addEventListener('click', async ()=>{
   const name = $('f-name').value.trim();
@@ -522,34 +739,18 @@ $('btn-save').addEventListener('click', async ()=>{
     inviteDate: $('f-invite-date').value,
     replyDate: $('f-reply-date').value,
     memo: $('f-memo').value.trim(),
+    createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
   try {
-    if (STATE.editingId){
-      await updateDoc(doc(db,'members',STATE.editingId), data);
-      toast('保存しました');
-    } else {
-      data.createdAt = serverTimestamp();
-      await addDoc(collection(db,'members'), data);
-      toast('追加しました');
-    }
-    closeEdit();
-  } catch(e){ toast('保存失敗: '+e.code); }
+    await addDoc(collection(db,'members'), data);
+    toast('追加しました');
+    closeAddModal();
+  } catch(e){ toast('追加失敗: '+e.code); }
 });
 
-$('btn-delete').addEventListener('click', ()=>{
-  if (!STATE.editingId) return;
-  showConfirm(`「${$('f-name').value}」を削除しますか?`, async ()=>{
-    try {
-      await deleteDoc(doc(db,'members',STATE.editingId));
-      toast('削除しました');
-      closeEdit();
-    } catch(e){ toast('削除失敗: '+e.code); }
-  });
-});
-
-$('fab-add').addEventListener('click', ()=>openEdit(null));
-$('search').addEventListener('input', e => { STATE.search = e.target.value; render(); });
+$('fab-add').addEventListener('click', openAddModal);
+$('search').addEventListener('input', e => { STATE.search = e.target.value; STATE.expandedId=null; render(); });
 
 // ====== メニュー ======
 $('btn-menu').addEventListener('click', ()=>$('menu-modal').classList.add('show'));
@@ -565,11 +766,9 @@ $('menu-logout').addEventListener('click', ()=>{
   location.reload();
 });
 
-// 集計
 $('menu-stats').addEventListener('click', ()=>{
   $('menu-modal').classList.remove('show');
   const c = computeCounts();
-  // 担当別集計
   const byStaff = {};
   STATE.members.forEach(m => {
     if (m.invite==='not_required') return;
@@ -600,7 +799,6 @@ $('menu-stats').addEventListener('click', ()=>{
   $('stats-modal').classList.add('show');
 });
 
-// ====== Excel出力 ======
 $('menu-export-xlsx').addEventListener('click', async ()=>{
   $('menu-modal').classList.remove('show');
   const items = getFiltered();
@@ -632,16 +830,19 @@ $('menu-export-xlsx').addEventListener('click', async ()=>{
   ws.autoFilter = {from:'A1', to:`I${items.length+1}`};
   const buf = await wb.xlsx.writeBuffer();
   const filterLabel = TABS.find(t=>t.key===STATE.filter)?.label || '';
-  saveAs(new Blob([buf]), `ピリリ会_${filterLabel}_${ymd()}.xlsx`);
+  const staffLabel = STATE.staffFilter==='all' ? '' :
+    (STATE.staffFilter==='__unassigned__' ? '_未割当' : `_${STATE.staffFilter}`);
+  saveAs(new Blob([buf]), `ピリリ会_${filterLabel}${staffLabel}_${ymd()}.xlsx`);
   toast('Excel出力しました');
 });
 
-// ====== PDF出力(window.print) ======
 $('menu-export-pdf').addEventListener('click', ()=>{
   $('menu-modal').classList.remove('show');
   const items = getFiltered();
   if (!items.length){ toast('出力するデータがありません'); return; }
   const filterLabel = TABS.find(t=>t.key===STATE.filter)?.label || '';
+  const staffLabel = STATE.staffFilter==='all' ? '' :
+    (STATE.staffFilter==='__unassigned__' ? ' / 担当:未割当' : ` / 担当:${STATE.staffFilter}`);
   const today = ymd();
   const rowsHtml = items.map((m,i)=>{
     const att = m.attend==='yes'?'○':(m.attend==='no'?'×':'');
@@ -668,7 +869,7 @@ tr:nth-child(even){background:#FBF7EC}
 .print-btn{position:fixed;top:10px;right:10px;padding:8px 16px;background:#8C6F2E;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer}
 </style></head><body>
 <button class="print-btn" onclick="window.print()">印刷 / PDF保存</button>
-<h1>ピリリ会パーティー ${filterLabel}名簿</h1>
+<h1>ピリリ会パーティー ${filterLabel}名簿${staffLabel}</h1>
 <div class="meta"><span>テレビせとうち 取締役相談役 土井雅人さん ご勇退記念パーティー(2026/7/2)</span><span>${items.length}件 / 出力日:${today}</span></div>
 <table><thead><tr><th style="width:6%">No</th><th style="width:13%">氏名</th><th style="width:20%">所属</th><th style="width:7%">案内</th><th style="width:6%">出欠</th><th style="width:9%">担当</th><th style="width:10%">案内日</th><th style="width:10%">返信日</th><th>備考</th></tr></thead>
 <tbody>${rowsHtml}</tbody></table>
@@ -677,7 +878,6 @@ tr:nth-child(even){background:#FBF7EC}
   w.document.close();
 });
 
-// ====== ユーティリティ ======
 function ymd(){
   const d = new Date();
   return d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2);
@@ -689,15 +889,10 @@ function showConfirm(msg, onYes){
   $('confirm-no').onclick = ()=>$('confirm-modal').classList.remove('show');
 }
 
-// ====== 起動 ======
-// 同セッション内ならパスワードを保持して自動再ログイン
 window.addEventListener('load', ()=>{
   const cachedPw = sessionStorage.getItem('pirili_pw');
-  if (cachedPw){
-    tryLogin(cachedPw);
-  }
+  if (cachedPw){ tryLogin(cachedPw); }
 });
-// パスワード成功時にセッションへ保存(tryLogin内のセット箇所も併用)
 </script>
 </body>
 </html>
